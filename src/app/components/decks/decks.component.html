@@ -1,0 +1,9 @@
+<div
+    class="deck"
+    *ngFor="let deck of decks"
+    (click)="shouldOpenDeck.emit(deck.name)">
+
+    <div class="deck-name">{{ deck.name }}</div>
+</div>
+
+<deck-create-container></deck-create-container>

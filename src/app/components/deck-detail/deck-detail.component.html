@@ -1,0 +1,16 @@
+<ng-container *ngIf="deck">
+    <div class="name">{{ deck.name }}</div>
+    <div class="prices-update-date">{{ deck.pricesUpdateDate }}</div>
+
+    <ul class="cards">
+        <li *ngFor="let cardInfo of deck.cards">
+            {{ cardInfo.quantityBought }} / {{ cardInfo.quantityWanted }} –
+            {{ cardInfo.card.name }}
+            <br>
+            <div *ngFor="let priceInfo of cardInfo.card.prices">
+                {{ priceInfo.set | uppercase }} {{ priceInfo.collectorNumber }} :
+                {{ (priceInfo.price | currency:'EUR':'symbol') || '?' }}
+            </div>
+        </li>
+    </ul>
+</ng-container>
