@@ -2,15 +2,41 @@
     <div class="name">{{ deck.name }}</div>
     <div class="prices-update-date">{{ deck.pricesUpdateDate }}</div>
 
-    <ul class="cards">
-        <li *ngFor="let cardInfo of deck.cards">
-            {{ cardInfo.quantityBought }} / {{ cardInfo.quantityWanted }} –
-            {{ cardInfo.card.name }}
-            <br>
-            <div *ngFor="let priceInfo of cardInfo.card.prices">
-                {{ priceInfo.set | uppercase }} {{ priceInfo.collectorNumber }} :
-                {{ (priceInfo.price | currency:'EUR':'symbol') || '?' }}
-            </div>
-        </li>
-    </ul>
+    <table class="cards">
+        <thead>
+            <tr>
+                <th>Quantité</th>
+                <th>Carte</th>
+                <th>Couleurs</th>
+                <th>MV</th>
+                <th>Prix</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr
+                *ngFor="let cardInfo of displayedDeckCards; even as even; odd as odd"
+                class="card"
+                [class.even]="even"
+                [class.odd]="odd">
+
+                <td class="card-quantity">
+                    {{ cardInfo.quantityBought }} / {{ cardInfo.quantityWanted }}
+                </td>
+                <td class="card-name">
+                    {{ cardInfo.card.name }}
+                </td>
+                <td class="card-colors">
+                    {{ cardInfo.card.colors.join('') }}
+                </td>
+                <td class="card-mana-value">
+                    {{ cardInfo.card.manaValue }}
+                </td>
+                <td class="card-mana-price">
+                    <span class="card-mana-price-set">{{ cardInfo.card.prices[0].set }}</span>&nbsp;
+                    <span class="card-mana-price-collector-number">{{ cardInfo.card.prices[0].collectorNumber }}</span>&nbsp;
+                    <span class="card-mana-price-price">{{ (cardInfo.card.prices[0].price | currency:'EUR':'symbol') || '?' }}</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </ng-container>
