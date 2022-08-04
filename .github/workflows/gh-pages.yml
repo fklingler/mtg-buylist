@@ -21,7 +21,7 @@ jobs:
       run: yarn
 
     - name: Build
-      run: yarn build
+      run: yarn build --configuration production --base-href https://fklingler.github.io/mtg-buylist/
 
     - name: Deploy
       if: success()
@@ -29,4 +29,3 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: dist/mtg-buylist
-        enable_jekyll: true
