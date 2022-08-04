@@ -1,17 +1,90 @@
-.deck {
-    &-name {
-        margin-bottom: 8px;
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
+    .deck-name {
         font-size: 1.5em;
 
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
+
+    .show-filter-button {
+        width: 42px;
+        height: 42px;
+
+        padding-right: 8px;
+
+        display: flex;
+        justify-content: right;
+        align-items: center;
+
+        font-size: 1.2em;
+
+        cursor: pointer;
+    }
 }
 
-.cards {
-    width: 100%;
+.filters {
+    margin-bottom: 16px;
+
+    padding: 8px;
+
+    border-radius: 4px;
+
+    background-color: #C899C9;
+
+    &-title {
+        margin-bottom: 2px;
+
+        font-size: 1.2em;
+
+        &:not(:first-child) {
+            margin-top: 12px;
+        }
+    }
+
+    &-category {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 2px 16px;
+    }
+
+    &-filter {
+        display: flex;
+        flex-direction: row;
+
+        align-items: center;
+
+        cursor: pointer;
+
+        &-checkbox {
+            height: 16px;
+            width: 16px;
+
+            margin-right: 4px;
+
+            border: 1px solid #0A0A0A;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        &-preview-count {
+            margin-left: 4px;
+
+            font-size: 0.7em;
+            color: #444444;
+        }
+
+        &-set {
+            text-transform: uppercase;
+        }
+    }
 }
 
 .card {
@@ -92,6 +165,8 @@
             padding: 8px 0;
 
             text-align: center;
+
+            cursor: pointer;
         }
     }
 

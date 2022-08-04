@@ -1,9 +1,76 @@
 <ng-container *ngIf="deck">
-    <div class="deck-name">{{ deck.name }}</div>
+    <div class="header">
+        <div class="deck-name">{{ deck.name }}</div>
+
+        <div class="show-filter-button" (click)="showFilters = !showFilters">
+            <fa-icon [icon]="icons.faFilter"></fa-icon>
+        </div>
+    </div>
+
+    <div class="filters" *ngIf="showFilters">
+        <div
+            class="filters-filter filters-filter-not-bought"
+            (click)="toggleFilterActive(notBoughtCardsFilter)">
+
+            <div class="filters-filter-checkbox">
+                <fa-icon *ngIf="getFilterActive(notBoughtCardsFilter)" [icon]="icons.faCheck"></fa-icon>
+            </div>
+
+            Cartes non-achetées
+
+            <div class="filters-filter-preview-count">
+                {{ getFilteredDeckCards(getPreviewFilters(notBoughtCardsFilter)).length }}
+            </div>
+        </div>
+
+        <div class="filters-title">
+            Couleurs et types
+        </div>
+
+        <div class="filters-category">
+            <div
+                *ngFor="let colorCardsFilter of getAvailableColorFilters()"
+                class="filters-filter filters-filter-colors"
+                (click)="toggleFilterActive(colorCardsFilter)">
+
+                <div class="filters-filter-checkbox">
+                    <fa-icon *ngIf="getFilterActive(colorCardsFilter)" [icon]="icons.faCheck"></fa-icon>
+                </div>
+
+                {{ colorCardsFilter.colors.join('') || 'C' }}
+
+                <div class="filters-filter-preview-count">
+                    {{ getFilteredDeckCards(getPreviewFilters(colorCardsFilter)).length }}
+                </div>
+            </div>
+        </div>
+
+        <div class="filters-title">
+            Sets
+        </div>
+
+        <div class="filters-category">
+            <div
+                *ngFor="let setCardsFilter of getAvailableSetFilters()"
+                class="filters-filter filters-filter-set"
+                (click)="toggleFilterActive(setCardsFilter)">
+
+                <div class="filters-filter-checkbox">
+                    <fa-icon *ngIf="getFilterActive(setCardsFilter)" [icon]="icons.faCheck"></fa-icon>
+                </div>
+
+                {{ setCardsFilter.set }}
+
+                <div class="filters-filter-preview-count">
+                    {{ getFilteredDeckCards(getPreviewFilters(setCardsFilter)).length }}
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="cards">
         <div
-            *ngFor="let cardInfo of displayedDeckCards"
+            *ngFor="let cardInfo of getDisplayedDeckCards()"
             class="card"
             [ngClass]="'color-' + getColorClass(cardInfo.card)"
             [class.bought]="cardInfo.quantityBought >= cardInfo.quantityWanted"
@@ -26,7 +93,7 @@
 
             <div class="card-best-price">
                 <ng-container *ngTemplateOutlet="price; context: {
-                    cardPrice: getBestPrice(cardInfo.card),
+                    cardPrice: getBestPrice(cardInfo.card, true),
                     card: cardInfo.card
                 }"></ng-container>
             </div>
@@ -41,14 +108,14 @@
                         class="card-quantity-modification-button"
                         (click)="updateCardQuantity(cardInfo.card, { quantityBought: -1 })">
 
-                        -
+                        <fa-icon [icon]="icons.faMinus"></fa-icon>
                     </div>
                     {{ cardInfo.quantityBought }}
                     <div
                         class="card-quantity-modification-button"
                         (click)="updateCardQuantity(cardInfo.card, { quantityBought: +1 })">
 
-                        +
+                        <fa-icon [icon]="icons.faPlus"></fa-icon>
                     </div>
                 </div>
 
@@ -59,14 +126,14 @@
                         class="card-quantity-modification-button"
                         (click)="updateCardQuantity(cardInfo.card, { quantityWanted: -1 })">
 
-                        -
+                        <fa-icon [icon]="icons.faMinus"></fa-icon>
                     </div>
                     {{ cardInfo.quantityWanted }}
                     <div
                         class="card-quantity-modification-button"
                         (click)="updateCardQuantity(cardInfo.card, { quantityWanted: +1 })">
 
-                        +
+                        <fa-icon [icon]="icons.faPlus"></fa-icon>
                     </div>
                 </div>
             </div>

@@ -20,18 +20,20 @@ export type Card = {
     prices: CardPrice[];
 }
 
+export type DeckCardInfo = {
+    card: Card;
+
+    quantityWanted: number;
+
+    quantityBought: number;
+}
+
 export type Deck = {
     name: string;
 
     pricesUpdateDate: string;
 
-    cards: Array<{
-        card: Card;
-
-        quantityWanted: number;
-
-        quantityBought: number;
-    }>
+    cards: DeckCardInfo[];
 }
 
 const cardPriceSchema: JTDSchemaType<CardPrice> = {
@@ -62,19 +64,21 @@ const cardSchema: JTDSchemaType<Card> = {
     }
 };
 
+const deckCardInfoSchema: JTDSchemaType<DeckCardInfo> = {
+    properties: {
+        card: cardSchema,
+
+        quantityWanted: { type: 'uint8' },
+        quantityBought: { type: 'uint8' }
+    }
+}
+
 const deckSchema: JTDSchemaType<Deck> = {
     properties: {
         name: { type: 'string' },
         pricesUpdateDate: { type: 'string' },
         cards: {
-            elements: {
-                properties: {
-                    card: cardSchema,
-
-                    quantityWanted: { type: 'uint8' },
-                    quantityBought: { type: 'uint8' }
-                }
-            }
+            elements: deckCardInfoSchema
         }
     }
 };
