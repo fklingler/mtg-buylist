@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { CreateDeckFromListProgress } from '../../containers/deck-create/deck-create.container';
 
 export type ShouldCreateDeckFromListOutputData = {
     deckName: string,
@@ -17,6 +18,9 @@ export class DeckCreateComponent {
 
     @Input()
     public error = false;
+
+    @Input()
+    public createDeckFromListProgress?: CreateDeckFromListProgress;
 
     @Output()
     public readonly shouldCreateDeckFromList = new EventEmitter<ShouldCreateDeckFromListOutputData>();

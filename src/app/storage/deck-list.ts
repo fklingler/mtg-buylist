@@ -1,4 +1,5 @@
 import Ajv, { JTDSchemaType } from 'ajv/dist/jtd';
+import { map, Observable, startWith, Subject } from 'rxjs';
 
 export type DeckList = Array<{
     name: string;
@@ -19,6 +20,8 @@ export const parseDeckList = ajv.compileParser(deckListSchema);
 
 const deckListKey = 'decklist';
 
+const onDeckListUpdated = new Subject<void>();
+
 export function getDeckList(): DeckList {
     const serializedDeckList = localStorage.getItem(deckListKey);
 
@@ -29,6 +32,12 @@ export function getDeckList(): DeckList {
     return parseDeckList(serializedDeckList) ?? [];
 }
 
+export function observeDeckList(): Observable<DeckList> {
+    return onDeckListUpdated.pipe(
+        startWith(undefined),
+        map(() => getDeckList()));
+}
+
 export function updateDeckList(deckList: DeckList): boolean {
     const serializedDeckList = serializeDeckList(deckList);
 
@@ -37,6 +46,8 @@ export function updateDeckList(deckList: DeckList): boolean {
     }
 
     localStorage.setItem(deckListKey, serializedDeckList);
+
+    onDeckListUpdated.next();
 
     return true;
 }

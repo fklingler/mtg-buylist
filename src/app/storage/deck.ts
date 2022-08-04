@@ -1,19 +1,23 @@
 import Ajv, { JTDSchemaType } from 'ajv/dist/jtd';
+import { filter, map, Observable, startWith, Subject } from 'rxjs';
 import { getDeckList, updateDeckList } from './deck-list';
+
+export type CardPrice = {
+    set: string;
+    collectorNumber: string;
+    releasedAt: string;
+    price?: number;
+}
 
 export type Card = {
     name: string;
 
+    land: boolean;
     colors: string[];
     colorIdentity: string[];
     manaValue: number;
 
-    prices: Array<{
-        set: string;
-        collectorNumber: string;
-        releasedAt: string;
-        price?: string;
-    }>;
+    prices: CardPrice[];
 }
 
 export type Deck = {
@@ -30,9 +34,21 @@ export type Deck = {
     }>
 }
 
+const cardPriceSchema: JTDSchemaType<CardPrice> = {
+    properties: {
+        set: { type: 'string' },
+        collectorNumber: { type: 'string' },
+        releasedAt: { type: 'string' }
+    },
+    optionalProperties: {
+        price: { type: 'float32' }
+    }
+}
+
 const cardSchema: JTDSchemaType<Card> = {
     properties: {
         name: { type: 'string' },
+        land: { type: 'boolean' },
         colors: {
             elements: { type: 'string' }
         },
@@ -41,16 +57,7 @@ const cardSchema: JTDSchemaType<Card> = {
         },
         manaValue: { type: 'uint8' },
         prices: {
-            elements: {
-                properties: {
-                    set: { type: 'string' },
-                    collectorNumber: { type: 'string' },
-                    releasedAt: { type: 'string' }
-                },
-                optionalProperties: {
-                    price: { type: 'string' }
-                }
-            }
+            elements: cardPriceSchema
         }
     }
 };
@@ -79,6 +86,8 @@ export const parseDeck = ajv.compileParser(deckSchema);
 
 const deckKey = (deckName: string) => `deck-${deckName}`;
 
+const onDeckUpdated = new Subject<string>();
+
 export function getDeck(name: string): Deck | undefined {
     const serializedDeck = localStorage.getItem(deckKey(name));
 
@@ -89,6 +98,13 @@ export function getDeck(name: string): Deck | undefined {
     return parseDeck(serializedDeck) ?? undefined;
 }
 
+export function observeDeck(name: string): Observable<Deck | undefined> {
+    return onDeckUpdated.pipe(
+        filter(deckName => deckName == name),
+        startWith(undefined),
+        map(() => getDeck(name)));
+}
+
 export function updateDeck(deck: Deck): boolean {
     const serializedDeck = serializeDeck(deck);
 
@@ -97,6 +113,8 @@ export function updateDeck(deck: Deck): boolean {
     }
 
     localStorage.setItem(deckKey(deck.name), serializedDeck);
+
+    onDeckUpdated.next(deck.name);
 
     return true;
 }

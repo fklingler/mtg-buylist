@@ -1,42 +1,102 @@
 <ng-container *ngIf="deck">
-    <div class="name">{{ deck.name }}</div>
-    <div class="prices-update-date">{{ deck.pricesUpdateDate }}</div>
+    <div class="deck-name">{{ deck.name }}</div>
 
-    <table class="cards">
-        <thead>
-            <tr>
-                <th>Quantité</th>
-                <th>Carte</th>
-                <th>Couleurs</th>
-                <th>MV</th>
-                <th>Prix</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr
-                *ngFor="let cardInfo of displayedDeckCards; even as even; odd as odd"
-                class="card"
-                [class.even]="even"
-                [class.odd]="odd">
+    <div class="cards">
+        <div
+            *ngFor="let cardInfo of displayedDeckCards"
+            class="card"
+            [ngClass]="'color-' + getColorClass(cardInfo.card)"
+            [class.bought]="cardInfo.quantityBought >= cardInfo.quantityWanted"
+            (click)="toggleDisplayPriceDetails(cardInfo.card)">
 
-                <td class="card-quantity">
-                    {{ cardInfo.quantityBought }} / {{ cardInfo.quantityWanted }}
-                </td>
-                <td class="card-name">
-                    {{ cardInfo.card.name }}
-                </td>
-                <td class="card-colors">
-                    {{ cardInfo.card.colors.join('') }}
-                </td>
-                <td class="card-mana-value">
-                    {{ cardInfo.card.manaValue }}
-                </td>
-                <td class="card-mana-price">
-                    <span class="card-mana-price-set">{{ cardInfo.card.prices[0].set }}</span>&nbsp;
-                    <span class="card-mana-price-collector-number">{{ cardInfo.card.prices[0].collectorNumber }}</span>&nbsp;
-                    <span class="card-mana-price-price">{{ (cardInfo.card.prices[0].price | currency:'EUR':'symbol') || '?' }}</span>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+            <div class="card-quantity" (click)="toggleDisplayedQuantityModification(cardInfo.card); $event.stopImmediatePropagation();">
+                <div class="card-quantity-text">
+                    {{ cardInfo.quantityWanted - cardInfo.quantityBought }}
+                </div>
+            </div>
+            <div class="card-name">
+                {{ cardInfo.card.name }}
+            </div>
+            <div class="card-colors">
+                {{ cardInfo.card.land ? 'L' : '' }}{{ cardInfo.card.colors.join('') }}
+            </div>
+            <div class="card-mana-value">
+                {{ cardInfo.card.manaValue }}
+            </div>
+
+            <div class="card-best-price">
+                <ng-container *ngTemplateOutlet="price; context: {
+                    cardPrice: getBestPrice(cardInfo.card),
+                    card: cardInfo.card
+                }"></ng-container>
+            </div>
+
+            <div
+                class="card-quantity-modification"
+                *ngIf="displayedQuantityModificationCardName == cardInfo.card.name"
+                (click)="$event.stopImmediatePropagation()">
+
+                <div class="card-quantity-modification-bought">
+                    <div
+                        class="card-quantity-modification-button"
+                        (click)="updateCardQuantity(cardInfo.card, { quantityBought: -1 })">
+
+                        -
+                    </div>
+                    {{ cardInfo.quantityBought }}
+                    <div
+                        class="card-quantity-modification-button"
+                        (click)="updateCardQuantity(cardInfo.card, { quantityBought: +1 })">
+
+                        +
+                    </div>
+                </div>
+
+                <div class="card-quantity-modification-separator">/</div>
+
+                <div class="card-quantity-modification-wanted">
+                    <div
+                        class="card-quantity-modification-button"
+                        (click)="updateCardQuantity(cardInfo.card, { quantityWanted: -1 })">
+
+                        -
+                    </div>
+                    {{ cardInfo.quantityWanted }}
+                    <div
+                        class="card-quantity-modification-button"
+                        (click)="updateCardQuantity(cardInfo.card, { quantityWanted: +1 })">
+
+                        +
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="card-price-details"
+                *ngIf="displayedPriceDetailsCardName == cardInfo.card.name">
+
+                <ng-container *ngFor="let cardPrice of getDisplayedDetailedPrices(cardInfo.card)">
+                    <ng-container *ngTemplateOutlet="price; context: {
+                        cardPrice: cardPrice,
+                        card: cardInfo.card
+                    }"></ng-container>
+                </ng-container>
+
+                <ng-container *ngIf="!getDisplayedDetailedPrices(cardInfo.card).length">
+                    Aucun autre prix
+                </ng-container>
+            </div>
+        </div>
+    </div>
 </ng-container>
+
+<ng-template #price let-cardPrice="cardPrice" let-card="card">
+    <div
+        class="card-price"
+        [ngClass]="'price-category-' + getPriceCategory(cardPrice, card)">
+
+        <span class="card-price-set">{{ cardPrice.set }}</span>
+        <span class="card-price-collector-number">{{ cardPrice.collectorNumber }}</span>
+        <span class="card-price-price">{{ cardPrice.price | currency:'EUR':'symbol' }}</span>
+    </div>
+</ng-template>

@@ -1,21 +1,31 @@
-<form
-    class="create-from-list"
-    [formGroup]="deckFromListForm"
-    (ngSubmit)="createDeckFromList()">
+<div *ngIf="!loading">
+    <form
+        class="create-from-list"
+        [formGroup]="deckFromListForm"
+        (ngSubmit)="createDeckFromList()">
 
-    <input type="text" formControlName="deckName" />
+        <input type="text" formControlName="deckName" />
 
-    <textarea formControlName="cardsList"></textarea>
+        <textarea formControlName="cardsList"></textarea>
 
-    <button type="submit">Create deck</button>
-</form>
+        <button type="submit">Create deck</button>
+    </form>
 
-<form
-    class="import"
-    [formGroup]="importForm"
-    (ngSubmit)="importDeck()">
+    <form
+        class="import"
+        [formGroup]="importForm"
+        (ngSubmit)="importDeck()">
 
-    <textarea formControlName="importData"></textarea>
+        <textarea formControlName="importData"></textarea>
 
-    <button type="submit">Import deck</button>
-</form>
+        <button type="submit">Import deck</button>
+    </form>
+</div>
+
+<div *ngIf="loading">
+    Chargement en cours...
+
+    <div *ngIf="createDeckFromListProgress as progress">
+        {{ progress.fetchedCards }} / {{ progress.totalCards }}
+    </div>
+</div>

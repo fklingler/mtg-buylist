@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { filter, map, Observable, tap } from 'rxjs';
-import { Deck, getDeck } from '../../storage';
+import { filter, map, Observable, switchMap, tap } from 'rxjs';
+import { Deck, observeDeck, updateDeck as updateDeckInStorage } from '../../storage';
 
 @Component({
     template: `
         <deck-detail
             [deck]="(deck$ | async)!"
+            (shouldUpdateDeck)="updateDeck($event)"
         ></deck-detail>
     `
 })
@@ -19,7 +20,7 @@ export class DeckDetailContainer {
 
         this.deck$ = activatedRoute.paramMap.pipe(
             map(paramMap => paramMap.get('deckName')),
-            map(deckName => deckName && getDeck(deckName)),
+            switchMap(deckName => observeDeck(deckName ?? '')),
             tap(deck => {
                 if (!deck) {
                     // noinspection JSIgnoredPromiseFromCall
@@ -27,5 +28,9 @@ export class DeckDetailContainer {
                 }
             }),
             filter((deck): deck is Deck => !!deck));
+    }
+
+    public updateDeck(deck: Deck): void {
+        updateDeckInStorage(deck);
     }
 }
